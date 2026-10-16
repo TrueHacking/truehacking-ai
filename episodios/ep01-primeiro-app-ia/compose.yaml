@@ -1,0 +1,27 @@
+services:
+  app:
+    build: ./app
+    ports: ["127.0.0.1:8501:8501"]
+    environment:
+      LAB_URL: http://lab:3000
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    depends_on: [lab]
+    networks: [frontend, backend]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+  lab:
+    build: ./lab
+    expose: ["3000"]
+    networks: [backend]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+networks:
+  frontend: {}
+  backend:
+    internal: true
